@@ -31,34 +31,39 @@ import {
   createAutoscaler,
   createPolicy,
   ratioSignal,
-} from '@absolutejs/autoscaler';
+} from "@absolutejs/autoscaler";
 
 const scaler = createAutoscaler({
   policy: createPolicy({
     min: 1,
     max: 20,
-    scaleUp:   { threshold: 0.75, cooldownMs: 60_000, step: 1 },
-    scaleDown: { threshold: 0.30, cooldownMs: 300_000, step: 1 },
+    scaleUp: { threshold: 0.75, cooldownMs: 60_000, step: 1 },
+    scaleDown: { threshold: 0.3, cooldownMs: 300_000, step: 1 },
   }),
   signals: [
-    ratioSignal('cpu',      0.80, async () => await meter.cpuUtilization()),
-    ratioSignal('queue',    100,  async () => await queue.depth(),
-                                 { observedKey: 'depth' }),
-    ratioSignal('latencyP95', 200, async () => await metrics.p95()),
+    ratioSignal("cpu", 0.8, async () => await meter.cpuUtilization()),
+    ratioSignal("queue", 100, async () => await queue.depth(), {
+      observedKey: "depth",
+    }),
+    ratioSignal("latencyP95", 200, async () => await metrics.p95()),
   ],
-  combine: 'max',          // worst pressure wins. or 'avg', or a custom fn
+  combine: "max", // worst pressure wins. or 'avg', or a custom fn
   actuator: {
-    list:      () => fleet.list(),
-    spawn:     () => fleet.provision(),
-    drain:     (id) => loadBalancer.remove(id),
+    list: () => fleet.list(),
+    spawn: () => fleet.provision(),
+    drain: (id) => loadBalancer.remove(id),
     terminate: (id) => fleet.destroy(id),
   },
-  audit: broker,           // optional; emits autoscaler.scale.up etc.
+  audit: broker, // optional; emits autoscaler.scale.up etc.
   intervalMs: 30_000,
 });
 
 scaler.start();
 // fires every 30s
+
+const reviewedPlan = await scaler.evaluate();
+await scaler.applyDecision(reviewedPlan, { maxAgeMs: 300_000 });
+// applies that exact plan only while its capacity precondition still holds
 
 const oneShot = await scaler.step();
 // { action: 'scale-up' | 'scale-down' | 'hold', score, currentCount,

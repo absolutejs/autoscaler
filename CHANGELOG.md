@@ -1,5 +1,26 @@
 # @absolutejs/autoscaler changelog
 
+## 0.2.0 — 2026-07-17
+
+### Added
+
+- `applyDecision(decision, { maxAgeMs })` applies the exact output of
+  `evaluate()` without re-reading signals. It rejects stale plans, live-capacity
+  drift, invalid direction, and policy-bound violations so an operator approval
+  remains bound to the reviewed plan.
+- `StaleAutoscalerDecisionError` lets control planes distinguish a plan that
+  must be regenerated from an actuator failure.
+
+### Changed
+
+- `step()` now composes `evaluate()` and `applyDecision()` so automatic and
+  plan-first execution share one actuator, audit, and metrics path.
+
+### Tests
+
+37 passing tests, including exact-plan application, capacity drift, and plan
+lifetime coverage.
+
 ## 0.1.0 — 2026-05-31
 
 Initial release. **Closes G15 — the final gap from the second-pass
