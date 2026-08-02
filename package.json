@@ -1,7 +1,7 @@
 {
   "name": "@absolutejs/autoscaler",
   "version": "0.2.1",
-  "description": "Horizontal-scaling policy substrate for the AbsoluteJS PaaS. createAutoscaler periodically evaluates pluggable signals (CPU, queue depth, latency, ...) against a declarative policy (min/max instances, scale-up/down thresholds, cooldowns) and drives a caller-supplied actuator (spawn / drain / terminate). Pure decision logic — cloud-specific actuators live in the control plane.",
+  "description": "Horizontal-scaling policy used by the hosted AbsoluteJS.ai platform and available to any Bun control plane. Evaluates pluggable signals against declarative scaling policy and drives a caller-supplied actuator.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/absolutejs/autoscaler.git"

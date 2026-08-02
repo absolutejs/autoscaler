@@ -1,6 +1,6 @@
 # `@absolutejs/autoscaler`
 
-> Horizontal-scaling policy substrate for the AbsoluteJS PaaS.
+> Horizontal-scaling policy used by the hosted AbsoluteJS.ai platform and available to any Bun control plane.
 
 `@absolutejs/autoscaler` owns the **decision** half of an
 autoscaler. The actuator half — actually provisioning a VM,
