@@ -365,7 +365,18 @@ export const createAutoscaler = (options: AutoscalerOptions): Autoscaler => {
     let desiredCount = currentCount;
     let reason = "within bands";
 
-    if (score >= policy.scaleUp.threshold) {
+    // Capacity bounds are invariants, not utilization hints. Reconcile them
+    // before thresholds and cooldowns so a cold fleet cannot remain below its
+    // minimum and an externally enlarged fleet cannot remain above its maximum.
+    if (currentCount < policy.min) {
+      action = "scale-up";
+      desiredCount = policy.min;
+      reason = `below min instances (${currentCount} < ${policy.min})`;
+    } else if (currentCount > policy.max) {
+      action = "scale-down";
+      desiredCount = policy.max;
+      reason = `above max instances (${currentCount} > ${policy.max})`;
+    } else if (score >= policy.scaleUp.threshold) {
       if (at - lastScaleUpAt < scaleUpCooldown) {
         reason = `scale-up cooldown (${Math.round(at - lastScaleUpAt)}ms < ${scaleUpCooldown}ms)`;
       } else if (currentCount >= policy.max) {

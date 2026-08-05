@@ -19,9 +19,9 @@ The actuator defines what "instance" means.
 ## Loop
 
 ```
-read signals  →  combine into a score  →  compare to thresholds  →
+read capacity + signals  →  restore hard min/max bounds first  →
+otherwise compare the combined score to thresholds  →
 if past threshold & cooldown elapsed  →  ask actuator to spawn/drain
-                                          (clamped to min/max)
 ```
 
 ## API
