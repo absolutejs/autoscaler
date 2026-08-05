@@ -1,5 +1,19 @@
 # @absolutejs/autoscaler changelog
 
+## 0.2.2 — 2026-08-04
+
+### Fixed
+
+- Treat `min` and `max` as hard capacity invariants before evaluating pressure
+  thresholds or cooldowns. Fleets below `min` now scale directly to the
+  minimum, and fleets above `max` scale directly to the maximum, even when
+  utilization is within the threshold band.
+
+### Tests
+
+39 passing tests, including regression coverage for both out-of-bounds
+directions.
+
 ## 0.2.0 — 2026-07-17
 
 ### Added

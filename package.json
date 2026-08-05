@@ -1,6 +1,6 @@
 {
   "name": "@absolutejs/autoscaler",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Horizontal-scaling policy used by the hosted AbsoluteJS.ai platform and available to any Bun control plane. Evaluates pluggable signals against declarative scaling policy and drives a caller-supplied actuator.",
   "repository": {
     "type": "git",

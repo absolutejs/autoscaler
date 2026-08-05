@@ -257,6 +257,54 @@ describe("evaluate", () => {
     expect(d.reason).toBe("within bands");
   });
 
+  test("below min → restore the hard minimum regardless of pressure", async () => {
+    const { actuator } = makeActuator([
+      { createdAt: 1, id: "i-1", state: "ready" },
+    ]);
+    const scaler = createAutoscaler({
+      actuator,
+      policy: createPolicy({
+        max: 5,
+        min: 3,
+        scaleDown: { threshold: 0.3 },
+        scaleUp: { threshold: 0.7 },
+      }),
+      signals: [constSignal("warm", 0.5)],
+    });
+
+    const d = await scaler.evaluate();
+
+    expect(d.action).toBe("scale-up");
+    expect(d.currentCount).toBe(1);
+    expect(d.desiredCount).toBe(3);
+    expect(d.reason).toContain("below min");
+  });
+
+  test("above max → restore the hard maximum regardless of pressure", async () => {
+    const { actuator } = makeActuator([
+      { createdAt: 1, id: "i-1", state: "ready" },
+      { createdAt: 2, id: "i-2", state: "ready" },
+      { createdAt: 3, id: "i-3", state: "ready" },
+    ]);
+    const scaler = createAutoscaler({
+      actuator,
+      policy: createPolicy({
+        max: 2,
+        min: 1,
+        scaleDown: { threshold: 0.3 },
+        scaleUp: { threshold: 0.7 },
+      }),
+      signals: [constSignal("warm", 0.5)],
+    });
+
+    const d = await scaler.evaluate();
+
+    expect(d.action).toBe("scale-down");
+    expect(d.currentCount).toBe(3);
+    expect(d.desiredCount).toBe(2);
+    expect(d.reason).toContain("above max");
+  });
+
   test("at max → hold instead of scale-up", async () => {
     const { actuator } = makeActuator([
       { createdAt: 1, id: "i-1", state: "ready" },
